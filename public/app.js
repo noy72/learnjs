@@ -5,7 +5,7 @@ var learnjs = {
 
 learnjs.identity = new $.Deferred();
 
-//source[leranjs/public/app.js]{
+//source[learnjs/public/app.js]{
 learnjs.problems = [
 	{
 		description: "What is truth?",
