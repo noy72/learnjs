@@ -51,13 +51,19 @@ learnjs.problemView = function(data) {
 
 learnjs.showView = function(hash) {
 	var routes = {
-		'#problem': learnjs.problemView
+		'#problem': learnjs.problemView,
+		'#': learnjs.landingView,
+		'': learnjs.landingView
 	};
 	var hashParts = hash.split('-');
 	var viewFn = routes[hashParts[0]];
 	if(viewFn) {
 		$('.view-container').empty().append(viewFn(hashParts[1]));
 	}
+}
+
+learnjs.landingView = function() {
+	return learnjs.template('landing-view');
 }
 
 learnjs.appOnReady = function() {
@@ -74,9 +80,6 @@ learnjs.flashElement = function(elem, content) {
 	});
 }
 
-learnjs.template = function(name) {
-	return $('.templates .' + name).clone();
-}
 
 learnjs.buildCorrectFlash = function(problemNum) {
 	var correctFlash = learnjs.template('correct-flash');
@@ -88,4 +91,8 @@ learnjs.buildCorrectFlash = function(problemNum) {
 		link.text("You're Finished!");
 	}
 	return correctFlash;
+}
+
+learnjs.template = function(name) {
+	return $('.templates .' + name).clone();
 }
