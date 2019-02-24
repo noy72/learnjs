@@ -1,9 +1,12 @@
 'use strict';
 var learnjs = {};
 
+
 learnjs.problemView = function(problemNumber) {
-	var title = 'Problem #' + problemNumber + ' Coming soon!';
-	return $('<div class=\'problem-view\'>').text(title);
+	// [!] A blank space appears at the beginning of the view.text()
+	var view = $('.templates .problem-view').clone();
+	view.find('.title').text('Problem #' + problemNumber + ' Coming soon!');
+	return view;
 }
 
 learnjs.showView = function(hash) {
