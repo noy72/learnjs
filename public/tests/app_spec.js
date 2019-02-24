@@ -1,4 +1,7 @@
 describe('LearnJS', function() {
+	beforeEach(function() {
+		view = learnjs.problemView(1);
+	});
 	it('can show a probelm view', function() {
 		learnjs.showView('#problem-1');
 		expect($('.view-container .problem-view').length).toEqual(1);
@@ -26,7 +29,6 @@ describe('LearnJS', function() {
 	
 	describe('problem view', function() {
 		it('has a title that includes the problem number', function() {
-			view = learnjs.problemView(1);
 			expect(view.find('.title').text().trim()).toEqual('Problem #1');
 		});
 		it('shows the description', function() {
@@ -34,6 +36,19 @@ describe('LearnJS', function() {
 		});
 		it('shows the problem code', function() {
 			expect(view.find('[data-name="code"]').text()).toEqual('function problem() { return __; }');
+		});
+	});
+
+	describe('answer section', function() {
+		it('can check a correct answer by hitting a button', function() {
+			view.find('.answer').val('true');
+			view.find('.check-btn').click();
+			expect(view.find('.result').text().trim()).toEqual('Correct! Next Problem');
+		});
+		it('rejects an incorrenct answer', function() {
+			view.find('.answer').val('false');
+			view.find('.check-btn').click();
+			expect(view.find('.result').text()).toEqual('Incorrect!');
 		});
 	});
 });
