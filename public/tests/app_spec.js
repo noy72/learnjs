@@ -1,7 +1,4 @@
 describe('LearnJS', function() {
-	beforeEach(function() {
-		view = learnjs.problemView(1);
-	});
 	it('can show a probelm view', function() {
 		learnjs.showView('#problem-1');
 		expect($('.view-container .problem-view').length).toEqual(1);
@@ -26,8 +23,23 @@ describe('LearnJS', function() {
 		$(window).trigger('hashchange');
 		expect(learnjs.showView).toHaveBeenCalledWith(window.location.hash);
 	});
+	it('can flash an element while setting the text', function() {
+		var elem = $('<p>');
+		spyOn(elem, 'fadeOut').and.callThrough();
+		spyOn(elem, 'fadeIn');
+		learnjs.flashElement(elem, "new text");
+		expect(elem.text()).toEqual("new text");
+		expect(elem.fadeOut).toHaveBeenCalled();
+		expect(elem.fadeIn).toHaveBeenCalled();
+	});
 	
 	describe('problem view', function() {
+		var view;
+
+		beforeEach(function() {
+			view = learnjs.problemView(1);
+		});
+
 		it('has a title that includes the problem number', function() {
 			expect(view.find('.title').text().trim()).toEqual('Problem #1');
 		});
@@ -40,15 +52,24 @@ describe('LearnJS', function() {
 	});
 
 	describe('answer section', function() {
+		var resultFlash;
+		var view;
+
+		beforeEach(function() {
+			spyOn(learnjs, 'flashElement');
+			view = learnjs.problemView(1);
+			resultFlash = view.find('.result');
+		});
+
 		it('can check a correct answer by hitting a button', function() {
 			view.find('.answer').val('true');
 			view.find('.check-btn').click();
-			expect(view.find('.result').text().trim()).toEqual('Correct! Next Problem');
+			expect(learnjs.flashElement).toHaveBeenCalledWith(resultFlash, 'Correct! Next Problem')
 		});
 		it('rejects an incorrenct answer', function() {
 			view.find('.answer').val('false');
 			view.find('.check-btn').click();
-			expect(view.find('.result').text()).toEqual('Incorrect!');
+			expect(learnjs.flashElement).toHaveBeenCalledWith(resultFlash, 'Incorrect!')
 		});
 	});
 });
