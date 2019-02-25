@@ -69,6 +69,30 @@ describe('LearnJS', function() {
 		});
 	});
 
+	describe('skip button', function() {
+		var view;
+
+		beforeEach(function() {
+			view = learnjs.problemView(1);
+		});
+
+		it('is added to the navbar when the view is added', function() {
+			expect($('.nav-list .skip-btn').length).toEqual(1);
+		});
+		it('is removed from the navbar when the view is removed', function() {
+			view.trigger('removingView');
+			expect($('.nav-list .skip-btn').length).toEqual(0);
+		});
+		it('contains a link to the next problem', function() {
+			expect($('.nav-list .skip-btn a').attr('href')).toEqual('#problem-2');
+		});
+		if('does not added when at the last problem', function() {
+			view.trigger('removingView');
+			view = learnjs.problemView('2');
+			expect($('.nav-list .skip-btn').length).toEqual(0);
+		});
+	})
+
 	describe('answer section', function() {
 		var resultFlash;
 		var view;
