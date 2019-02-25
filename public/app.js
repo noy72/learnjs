@@ -98,7 +98,7 @@ learnjs.appOnReady = function() {
 }
 
 learnjs.flashElement = function(elem, content) {
-	elem.fadeOut('fact', function() {
+	elem.fadeOut('fast', function() {
 		elem.html(content);
 		elem.fadeIn();
 	});
