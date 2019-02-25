@@ -229,10 +229,14 @@ describe('LearnJS', function() {
 
 		describe('when the answer is correct', function() {
 			beforeEach(function() {
+				spyOn(learnjs, 'saveAnswer');
 				view.find('.answer').val('true');
 				view.find('.check-btn').click();
 			});
 
+			it('saves the result', function() {
+				expect(learnjs.saveAnswer).toHaveBeenCalledWith(1, "true");
+			});
 			it('flashes the result', function() {
 				var flashArgs = learnjs.flashElement.calls.argsFor(0);
 				expect(flashArgs[0]).toEqual(resultFlash);
