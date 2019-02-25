@@ -65,6 +65,7 @@ learnjs.problemView = function(data) {
 learnjs.showView = function(hash) {
 	var routes = {
 		'#problem': learnjs.problemView,
+		'#profile': learnjs.profileView,
 		'#': learnjs.landingView,
 		'': learnjs.landingView
 	};
@@ -80,11 +81,20 @@ learnjs.landingView = function() {
 	return learnjs.template('landing-view');
 }
 
+learnjs.profileView = function() {
+	var view = learnjs.template('profile-view');
+	learnjs.identity.done(function(identity){
+		view.find('.email').text(identity.email);
+	});
+	return view;
+}
+
 learnjs.appOnReady = function() {
 	window.onhashchange = function() {
 		learnjs.showView(window.location.hash);
 	}
 	learnjs.showView(window.location.hash);
+	learnjs.identity.done(learnjs.addProfileLink);
 }
 
 learnjs.flashElement = function(elem, content) {
@@ -92,6 +102,12 @@ learnjs.flashElement = function(elem, content) {
 		elem.html(content);
 		elem.fadeIn();
 	});
+}
+
+learnjs.addProfileLink = function(profile) {
+	var link = learnjs.template('profile-link');
+	link.find('a').text(profile.email);
+	$('.signin-bar').prepend(link);
 }
 
 
