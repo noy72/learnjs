@@ -1,4 +1,8 @@
 describe('LearnJS', function() {
+	beforeEach(function() {
+		learnjs.identity = new $.Deferred();
+	});
+
 	it('can show a probelm view', function() {
 		learnjs.showView('#problem-1');
 		expect($('.view-container .problem-view').length).toEqual(1);
@@ -65,6 +69,35 @@ describe('LearnJS', function() {
 				email: 'foo@bar.com'
 			});
 			expect(view.find('.email').text()).toEqual("foo@bar.com");
+		});
+	});
+
+	describe('googleSignIn callback', function() {
+		var user, fakeCreds;
+
+		beforeEach(function() {
+			profile = jasmine.createSpyObj('profile', ['getEmail']);
+			fakeCreds = jasmine.createSpyObj('creds', ['refresh']);
+			fakeCreds.refresh.and.callFake(function(c) { c() });
+			fakeCreds.identity = "COGNITO_ID"
+			spyOn(AWS, 'CognitoIdentityCredentials').and.returnValue(fakeCreds);
+			user = jasmine.createSpyObj('user', ['getAuthResponse', 'getBasicProfile']);
+			user.getAuthResponse.and.returnValue({id_token: 'GOOGLE_ID'});
+			user.getBasicProfile.and.returnValue(profile);
+			profile.getEmail.and.returnValue('foo@bar.com');
+			googleSignIn(user);
+		});
+
+		it('sets the AWS region', function() {
+			expect(AWS.config.region).toEqual('us-east-1');
+		});
+		it('sets the identity pool ID and Google ID token', function() {
+			expect(AWS.CognitoIdentityCredentials).toHaveBeenCalledWith({
+				IdentityPoolId: learnjs.poolId,
+				Logins: {
+					'accounts.google.com': 'GOOGLE_ID'
+				}
+			});
 		});
 	});
 	
