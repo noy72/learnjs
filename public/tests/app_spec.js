@@ -74,30 +74,69 @@ describe('LearnJS', function() {
 		expect($('.signin-bar a').attr('href')).toEqual('#profile');
 	});
 
-	describe('saveAnswer', function() {
+	describe('with DynamoDB', function() {
 		var dbspy, req, identityObj;
 		beforeEach(function() {
-			jasmine.createSpyObj('db', ['put']).put.and.returnValue('request');
-			dbspy = jasmine.createSpyObj('db', ['put']);
-			dbspy.put.and.returnValue('request');
+			dbspy = jasmine.createSpyObj('db', ['get', 'put']);
 			spyOn(AWS.DynamoDB,'DocumentClient').and.returnValue(dbspy);
 			spyOn(learnjs, 'sendDbRequest');
 			identityObj = {id: 'COGNITO_ID'};
 			learnjs.identity.resolve(identityObj);
 		});
 
-		it('writes the item to the database', function() {
-			learnjs.saveAnswer(1, {});
-			expect(learnjs.sendDbRequest).toHaveBeenCalledWith('request', jasmine.any(Function));
-			expect(dbspy.put).toHaveBeenCalledWith({
-				TableName: 'learnjs',
-				Item: {
-					userId: 'COGNITO_ID',
-					problemId: 1,
-					answer: {}
-				}
+		describe('fetchAnswer', function() {
+			beforeEach(function() {
+				dbspy.get.and.returnValue('request');
+			});
+
+			it('reads the item from the database', function(done) {
+				learnjs.sendDbRequest.and.returnValue(new $.Deferred().resolve('item'));
+				learnjs.fetchAnswer(1).then(function(item) {
+					expect(item).toEqual('item');
+					expect(learnjs.sendDbRequest).toHaveBeenCalledWith('request', jasmine.any(Function));
+					expect(dbspy.get).toHaveBeenCalledWith({
+						TableName: 'learnjs',
+						Item: {
+							userId: 'COGNITO_ID',
+							problemId: 1
+						}
+					});
+					done();
+				});
+			});
+			it('resubmits the request on retry', function() {
+				learnjs.fetchAnswer(1, {answer: 'false'});
+				spyOn(learnjs, 'fetchAnswer').and.returnValue('promise');
+				expect(learnjs.sendDbRequest.calls.first().args[1]()).toEqual('promise');
+				expect(learnjs.fetchAnswer).toHaveBeenCalledWith(1);
+			})
+		});
+
+		describe('saveAnswer', function() {
+			beforeEach(function() {
+				dbspy.put.and.returnValue('request');
+			});
+
+			it('writes the item the database', function() {
+				learnjs.saveAnswer(1, {});
+				expect(learnjs.sendDbRequest).toHaveBeenCalledWith('request', jasmine.any(Function));
+				expect(dbspy.put).toHaveBeenCalledWith({
+					TableName: 'learnjs',
+					Item: {
+						userId: 'COGNITO_ID',
+						problemId: 1,
+						answer: {}
+					}
+				});
+			});
+			it('resubmits the request on retry', function() {
+				learnjs.saveAnswer(1, {answer: 'false'});
+				spyOn(learnjs, 'saveAnswer').and.returnValue('promise');
+				expect(learnjs.sendDbRequest.calls.first().args[1]()).toEqual('promise');
+				expect(learnjs.saveAnswer).toHaveBeenCalledWith(1, {answer: 'false'});
 			});
 		});
+
 		it('resubmits the request on retry', function() {
 			learnjs.saveAnswer(1, {answer: 'false'});
 			spyOn(learnjs, 'saveAnswer').and.returnValue('promise');

@@ -223,5 +223,17 @@ learnjs.saveAnswer = function(problemId, answer) {
 }
 
 learnjs.fetchAnswer = function(problemId) {
-
+	return learnjs.identity.then(function(identity) {
+		var db = new AWS.DynamoDB.DocumentClient();
+		var item = {
+			TableName: 'learnjs',
+			Item: {
+				userId: identity.id,
+				problemId: problemId,
+			}
+		};
+		return learnjs.sendDbRequest(db.get(item), function() {
+			return learnjs.fetchAnswer(problemId);
+		})
+	});
 }
