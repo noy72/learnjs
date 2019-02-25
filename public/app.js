@@ -144,18 +144,6 @@ function googleSignIn(googleUser) {
 		})
 	})
 
-	learnjs.awsRefresh = function() {
-		var deferred = new $.Deferred();
-			AWS.config.credentials.refresh(function(err) {
-			if (err) {
-				deferred.reject(err);
-			} else {
-				deferred.resolve(AWS.config.credentials.identityId);
-			}
-		});
-		return deferred.promise();
-	}
-
 	learnjs.awsRefresh().then(function(id) {
 		learnjs.identity.resolve({
 			id: id,
@@ -163,6 +151,18 @@ function googleSignIn(googleUser) {
 			refresh: refresh
 		});
 	});
+}
+
+learnjs.awsRefresh = function() {
+	var deferred = new $.Deferred();
+		AWS.config.credentials.refresh(function(err) {
+		if (err) {
+			deferred.reject(err);
+		} else {
+			deferred.resolve(AWS.config.credentials.identityId);
+		}
+	});
+	return deferred.promise();
 }
 
 function refresh() {
