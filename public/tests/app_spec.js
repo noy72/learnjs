@@ -37,6 +37,14 @@ describe('LearnJS', function() {
 		expect(flash.find('a').attr('href')).toEqual("");
 		expect(flash.find('a').text()).toEqual("You're Finished!");
 	});
+	it('can trigger events on the view', function() {
+		callback = jasmine.createSpy('callback');
+		var div = $('<div>').bind('fooEvent', callback);
+		$('.view-container').append(div);
+		learnjs.triggerEvent('fooEvent', ['bar']);
+		expect(callback).toHaveBeenCalled();
+		expect(callback.calls.argsFor(0)[1]).toEqual('bar');
+	});
 	
 	describe('problem view', function() {
 		var view;
