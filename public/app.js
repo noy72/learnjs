@@ -38,9 +38,8 @@ learnjs.problemView = function(data) {
 
 	function checkAnswerClick() {
 		if (checkAnswer()) {
-			var correctFlash = learnjs.template('correct-flash');
-			correctFlash.find('a').attr('href', '#problem-' + (problemNumber + 1));
-			learnjs.flashElement(resultFlash, correctFlash);
+			var flashContent = learnjs.buildCorrectFlash(problemNumber);
+			learnjs.flashElement(resultFlash, flashContent);
 		} else {
 			learnjs.flashElement(resultFlash, 'Incorrect!');
 		}
