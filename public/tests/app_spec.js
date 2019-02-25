@@ -3,10 +3,23 @@ describe('LearnJS', function() {
 		learnjs.identity = new $.Deferred();
 	});
 
-	it('can show a probelm view', function() {
-		learnjs.showView('#problem-1');
-		expect($('.view-container .problem-view').length).toEqual(1);
+	describe('changing views', function() {
+		beforeEach(function() {
+			fetchAnswerDef = new $.Deferred();
+			spyOn(learnjs, 'fetchAnswer').and.returnValue(fetchAnswerDef);
+		});
+
+		it('can show a problem view', function() {
+			learnjs.showView('#problem-1');
+			expect($('.view-container .problem-view').length).toEqual(1);
+		});
+		it('triggers removingView event when removing the view', function() {
+			spyOn(learnjs, 'triggerEvent');
+			learnjs.showView('#problem-1');
+			expect(learnjs.triggerEvent).toHaveBeenCalledWith('removingView', []);
+		});
 	});
+
 	it('shows the loading page view when there is no hash', function() {
 		learnjs.showView('');
 		expect($('.view-container .landing-view').length).toEqual(1)
@@ -15,11 +28,6 @@ describe('LearnJS', function() {
 		spyOn(learnjs, 'problemView');
 		learnjs.showView('#problem-42');
 		expect(learnjs.problemView).toHaveBeenCalledWith('42')
-	});
-	it('triggers removingView event when removing the view', function() {
-		spyOn(learnjs, 'triggerEvent');
-		learnjs.showView('#problem-1');
-		expect(learnjs.triggerEvent).toHaveBeenCalledWith('removingView', []);
 	});
 	it('invokes the router when loaded', function() {
 		spyOn(learnjs, 'showView');
@@ -243,12 +251,29 @@ describe('LearnJS', function() {
 	});
 	
 	describe('problem view', function() {
-		var view;
+		var view, fetchAnswerDef;
 
 		beforeEach(function() {
+			fetchAnswerDef = new $.Deferred();
+			spyOn(learnjs, 'fetchAnswer').and.returnValue(fetchAnswerDef);
 			view = learnjs.problemView(1);
 		});
 
+		it('loads the previous answer, if there is one', function(done) {
+			fetchAnswerDef.resolve({Item: {answer: 'true'}}).then(function() {
+				expect(view.find('.answer').val()).toEqual('true');
+				done();
+			});
+		});
+		it('keeps the answer blonk util the promise is resolved', function() {
+			expect(view.find('.answer').val()).toEqual('');
+		});
+		it('does nothing if the question has not been answered yet', function(done) {
+			fetchAnswerDef.resolve({}).then(function() {
+				expect(view.find('.answer').val()).toEqual('');
+				done();
+			});
+		});
 		it('has a title that includes the problem number', function() {
 			expect(view.find('.title').text().trim()).toEqual('Problem #1');
 		});

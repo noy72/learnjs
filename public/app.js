@@ -56,6 +56,12 @@ learnjs.problemView = function(data) {
 		});
 	}
 
+	learnjs.fetchAnswer(problemNumber).then(function(data) {
+		if (data.Item) {
+			answer.val(data.Item.answer);
+		}
+	});
+
 	view.find('.check-btn').click(checkAnswerClick);
 	view.find('.title').text('Problem #' + problemNumber);
 	learnjs.applyObject(problemData, view);
@@ -214,4 +220,8 @@ learnjs.saveAnswer = function(problemId, answer) {
 			return learnjs.saveAnswer(problemId, answer);
 		})
 	});
+}
+
+learnjs.fetchAnswer = function(problemId) {
+
 }
