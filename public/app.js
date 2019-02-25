@@ -38,9 +38,8 @@ learnjs.problemView = function(data) {
 
 	function checkAnswerClick() {
 		if (checkAnswer()) {
-			var correctFlash = learnjs.template('correct-flash');
-			correctFlash.find('a').attr('href', '#problem-' + (problemNumber + 1));
-			learnjs.flashElement(resultFlash, correctFlash);
+			var flashContent = learnjs.buildCorrectFlash(problemNumber);
+			learnjs.flashElement(resultFlash, flashContent);
 		} else {
 			learnjs.flashElement(resultFlash, 'Incorrect!');
 		}
@@ -72,7 +71,7 @@ learnjs.showView = function(hash) {
 	var hashParts = hash.split('-');
 	var viewFn = routes[hashParts[0]];
 	if(viewFn) {
-		learnjs.triggerEvent('removeingView', []);
+		learnjs.triggerEvent('removingView', []);
 		$('.view-container').empty().append(viewFn(hashParts[1]));
 	}
 }
@@ -98,7 +97,7 @@ learnjs.appOnReady = function() {
 }
 
 learnjs.flashElement = function(elem, content) {
-	elem.fadeOut('fact', function() {
+	elem.fadeOut('fast', function() {
 		elem.html(content);
 		elem.fadeIn();
 	});
